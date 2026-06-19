@@ -44,9 +44,9 @@ def main():
     future["revenue_low"]       = future["predicted_revenue"] * 0.85
     future["revenue_mid"]       = future["predicted_revenue"]
     future["revenue_high"]      = future["predicted_revenue"] * 1.15
-    future["roas_low"]  = np.where(future["spend"]>0, future["revenue_low"]  / future["spend"], 0)
-    future["roas_mid"]  = np.where(future["spend"]>0, future["revenue_mid"]  / future["spend"], 0)
-    future["roas_high"] = np.where(future["spend"]>0, future["revenue_high"] / future["spend"], 0)
+    future["roas_low"]  = np.where(future["spend"] > 0, future["revenue_low"]  / future["spend"], 0)
+    future["roas_mid"]  = np.where(future["spend"] > 0, future["revenue_mid"]  / future["spend"], 0)
+    future["roas_high"] = np.where(future["spend"] > 0, future["revenue_high"] / future["spend"], 0)
 
     results = []
     for window in [30, 60, 90]:
@@ -55,32 +55,59 @@ def main():
         if subset.empty:
             continue
 
+        # --- Channel level ---
         for ch in subset["channel"].unique():
             c = subset[subset["channel"] == ch]
             results.append({
                 "forecast_window_days": window, "level": "channel",
                 "group": ch, "campaign_type": "ALL", "campaign_name": "ALL",
-                "total_spend": round(c["spend"].sum(), 2),
-                "revenue_low": round(c["revenue_low"].sum(), 2),
-                "revenue_mid": round(c["revenue_mid"].sum(), 2),
+                "total_spend":  round(c["spend"].sum(), 2),
+                "revenue_low":  round(c["revenue_low"].sum(), 2),
+                "revenue_mid":  round(c["revenue_mid"].sum(), 2),
                 "revenue_high": round(c["revenue_high"].sum(), 2),
-                "roas_low": round(c["roas_low"].mean(), 4),
-                "roas_mid": round(c["roas_mid"].mean(), 4),
-                "roas_high": round(c["roas_high"].mean(), 4),
+                "roas_low":     round(c["roas_low"].mean(), 4),
+                "roas_mid":     round(c["roas_mid"].mean(), 4),
+                "roas_high":    round(c["roas_high"].mean(), 4),
             })
 
+        # --- Campaign type level ---
         for ct in subset["campaign_type"].unique():
             c = subset[subset["campaign_type"] == ct]
             results.append({
                 "forecast_window_days": window, "level": "campaign_type",
                 "group": ct, "campaign_type": ct, "campaign_name": "ALL",
-                "total_spend": round(c["spend"].sum(), 2),
-                "revenue_low": round(c["revenue_low"].sum(), 2),
-                "revenue_mid": round(c["revenue_mid"].sum(), 2),
+                "total_spend":  round(c["spend"].sum(), 2),
+                "revenue_low":  round(c["revenue_low"].sum(), 2),
+                "revenue_mid":  round(c["revenue_mid"].sum(), 2),
                 "revenue_high": round(c["revenue_high"].sum(), 2),
-                "roas_low": round(c["roas_low"].mean(), 4),
-                "roas_mid": round(c["roas_mid"].mean(), 4),
-                "roas_high": round(c["roas_high"].mean(), 4),
+                "roas_low":     round(c["roas_low"].mean(), 4),
+                "roas_mid":     round(c["roas_mid"].mean(), 4),
+                "roas_high":    round(c["roas_high"].mean(), 4),
             })
 
-        for cn in subset
+        # --- Campaign level ---
+        for cn in subset["campaign_name"].unique():
+            c = subset[subset["campaign_name"] == cn]
+            ct = c["campaign_type"].iloc[0] if not c.empty else "UNKNOWN"
+            ch = c["channel"].iloc[0] if not c.empty else "UNKNOWN"
+            results.append({
+                "forecast_window_days": window, "level": "campaign",
+                "group": cn, "campaign_type": ct, "campaign_name": cn,
+                "total_spend":  round(c["spend"].sum(), 2),
+                "revenue_low":  round(c["revenue_low"].sum(), 2),
+                "revenue_mid":  round(c["revenue_mid"].sum(), 2),
+                "revenue_high": round(c["revenue_high"].sum(), 2),
+                "roas_low":     round(c["roas_low"].mean(), 4),
+                "roas_mid":     round(c["roas_mid"].mean(), 4),
+                "roas_high":    round(c["roas_high"].mean(), 4),
+            })
+
+    # --- Write output ---
+    out_df = pd.DataFrame(results)
+    os.makedirs(os.path.dirname(args.output) if os.path.dirname(args.output) else ".", exist_ok=True)
+    out_df.to_csv(args.output, index=False)
+    print(f"Predictions written to {args.output} ({len(out_df)} rows)")
+
+
+if __name__ == "__main__":
+    main()

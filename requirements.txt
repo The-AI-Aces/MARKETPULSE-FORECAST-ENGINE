@@ -37,3 +37,4 @@ echo uvicorn==0.49.0 >> requirements.txt
 echo watchdog==6.0.0 >> requirements.txt
 echo websockets==16.0 >> requirements.txt
 echo groq==0.28.0 >> requirements.txt
+python-dotenv==1.0.1

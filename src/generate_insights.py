@@ -3,10 +3,12 @@ import pandas as pd
 import os
 import time
 import sys
+from dotenv import load_dotenv
+load_dotenv()
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "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":
+if not GROQ_API_KEY :
     print("WARNING: No GROQ_API_KEY found — using pre-generated insight files")
     sys.exit(0)
 
