@@ -251,14 +251,3 @@ After the forecast is produced, the structured output (total spend, revenue rang
 
 ---
 
-## Evaluation Criteria Mapping
-
-| Criterion | Where it is addressed |
-|---|---|
-| **Technical Soundness** | Documented feature engineering, model selection rationale, explicit uncertainty methodology |
-| **Practical Relevance** | Budget simulator and campaign drill-downs mirror real agency planning workflows |
-| **AI Integration** | Structured number-grounded LLM prompting, offline-safe for grading |
-| **Product Thinking** | Single-screen workflow: select window → adjust budgets → read range → read why |
-| **Engineering Quality** | Clean pipeline separation, validated inputs, single-command run path, no hardcoded paths or secrets |
-
----
